@@ -1,14 +1,15 @@
 package com.erank.boradcasttutorial;
 
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +25,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendDataOut() {
-        Intent intent = new Intent(ACTION).putExtra("name", "Eran");
-        sendBroadcast(intent);
+        PackageManager pm = getPackageManager();
+        Intent i = new Intent(ACTION).putExtra("name", "Eran");
+        List<ResolveInfo> matches = pm.queryBroadcastReceivers(i, 0);
+        for (ResolveInfo resolveInfo : matches) {
+            String packageName = resolveInfo.activityInfo.applicationInfo.packageName;
+            ComponentName cn = new ComponentName(packageName, resolveInfo.activityInfo.name);
+            i.setComponent(cn);
+            sendBroadcast(i);
+        }
     }
 }
